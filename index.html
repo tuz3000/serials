@@ -35,7 +35,6 @@ body{margin:0;font-family:Arial,sans-serif;background:radial-gradient(circle at 
 .title{flex:1;min-width:0;font-size:18px;line-height:1.2;font-weight:900;overflow-wrap:anywhere;word-break:normal;hyphens:auto;-webkit-hyphens:auto;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
 .btn{flex:0 0 auto;margin-left:auto;background:white;color:#050505;padding:10px 13px;border-radius:12px;font-size:13px;font-weight:900;text-decoration:none;white-space:nowrap;text-align:center}
 #popular .item{background:rgba(246,196,83,.08);border:1px solid rgba(246,196,83,.18)}
-#newList .item{background:rgba(255,255,255,.045)}
 #scrollTopBtn{position:fixed;right:18px;bottom:18px;width:54px;height:54px;display:none;align-items:center;justify-content:center;border:none;border-radius:50%;background:rgba(255,255,255,.08);backdrop-filter:blur(14px);color:white;font-size:24px;cursor:pointer;z-index:9999;box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.15)}
 .modal{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.86);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:18px}
 .modal-box{width:100%;max-width:420px;background:#111114;border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:16px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)}
@@ -85,12 +84,6 @@ body{margin:0;font-family:Arial,sans-serif;background:radial-gradient(circle at 
   <div id="popularArrow">▾</div>
 </div>
 <div id="popularWrap" style="display:none;"><div class="list" id="popular"></div></div>
-
-<div class="section" onclick="toggleNew()">
-  <div><span>NEW</span> Новинки</div>
-  <div id="newArrow">▾</div>
-</div>
-<div id="newWrap" style="display:none;"><div class="list" id="newList"></div></div>
 
 <div class="section">🎬 Все сериалы</div>
 <div class="list" id="list"></div>
@@ -437,7 +430,6 @@ async function loadSheet(){
     }).filter(i=>i.title);
 
     render(getFilteredData());
-    renderNew(allData);
     loadPopular();
   }catch(err){
     console.error("Не удалось загрузить Google Sheets",err);
@@ -530,17 +522,6 @@ function render(list){
   updateCounter(list.length);
 }
 
-function renderNew(list){
-  const box=document.getElementById("newList");
-  box.innerHTML="";
-
-  const hasDates=list.some(i=>i.date_added_ts>0);
-  const newest=hasDates
-    ? [...list].sort((a,b)=>(b.date_added_ts-a.date_added_ts)||(b.row_index-a.row_index)).slice(0,5)
-    : list.slice(-5).reverse();
-
-  newest.forEach(i=>box.appendChild(createItem(i)));
-}
 
 function updateSearchClearButton(){
   const search=document.getElementById("search");
@@ -656,7 +637,6 @@ function scrollToTitle(title){
 }
 
 let openPopular=false;
-let openNew=false;
 
 function togglePopular(){
   openPopular=!openPopular;
@@ -664,11 +644,6 @@ function togglePopular(){
   document.getElementById("popularArrow").innerText=openPopular?"▴":"▾";
 }
 
-function toggleNew(){
-  openNew=!openNew;
-  document.getElementById("newWrap").style.display=openNew?"block":"none";
-  document.getElementById("newArrow").innerText=openNew?"▴":"▾";
-}
 
 document.getElementById("search").addEventListener("input",()=>{
   updateSearchClearButton();
